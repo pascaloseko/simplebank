@@ -1,0 +1,34 @@
+[run]
+
+skip-files = ".*\\.pb\\.go$"
+
+timeout = "10m"
+
+[issues]
+
+max-same-issues = 0
+exclude=[
+    'declaration of "(err|ctx)" shadows declaration at',
+]
+
+[linters-settings.misspell]
+
+locale = "US"
+
+[linters-settings.govet]
+
+check-shadowing = true
+disable = ["composites"]
+
+[linters-settings.importas]
+no-extra-aliases = true
+alias = [
+    {pkg = "go.opentelemetry.io/otel/sdk/trace", alias = "sdktrace"},
+    {pkg = "github.com/satori/go.uuid", alias = "uuid"},
+    {pkg = "crypto/rand", alias = "cryptorand"},
+    {pkg = "math/rand", alias = "mathrand"},
+]
+
+[linters]
+
+enable = ["misspell", "gofmt", "revive", "goimports", "importas"]

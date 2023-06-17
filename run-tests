@@ -1,0 +1,28 @@
+#!/bin/bash -ex
+
+RED=$'\e[1;31m'
+END=$'\e[0m'
+
+function exit_with_message {
+    echo "${RED}FAIL: $1${END}"
+    exit 1
+}
+
+export CONFIG_FILE="/app/config.local.toml"
+
+if [[ "${RUNTIME_ENVIRONMENT}" == "cloudbuild" ]]; then
+    golangci-lint run -v || exit_with_message "linter failed"
+fi
+
+GOTEST_OPTS="$* ${GOTEST_OPTS}"
+
+if [[ "${RUNTIME_ENVIRONMENT}" == "cloudbuild" ]]; then
+    GOTEST_OPTS="-cover -coverprofile coverage.txt"
+fi
+
+go test -v -race ./... ${GOTEST_OPTS}
+
+if [[ "${RUNTIME_ENVIRONMENT}" == "cloudbuild" ]]; then
+    mkdir -p /workspace/artifacts/
+    cp -r coverage.txt /workspace/artifacts/.
+fi

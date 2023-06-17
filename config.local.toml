@@ -1,0 +1,5 @@
+Environment = "local"
+LogLevel = "debug"
+
+DBUrl = "postgres://postgres:password@127.0.0.1:5432/simple_bank?sslmode=disable"
+TestDBUrl = "postgres://user:mypassword@db:5432/user?sslmode=disable"
