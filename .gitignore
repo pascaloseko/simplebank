@@ -166,7 +166,4 @@ dist
 
 # End of https://www.toptal.com/developers/gitignore/api/node,go
 
-/.idea/.gitignore
-/.idea/modules.xml
-/.idea/review-backend.iml
-/.idea/vcs.xml
+/.idea/*
