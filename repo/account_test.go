@@ -3,7 +3,6 @@ package repo
 import (
 	"context"
 	"database/sql"
-	"os"
 	"testing"
 	"time"
 
@@ -11,31 +10,14 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v4/stdlib" // For pqx driver through sql
 	_ "github.com/lib/pq"
-	"github.com/simplebank/config"
 	"github.com/simplebank/internal/testutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-var dbURL string
-
-func SetupTables(t *testing.T) (*sql.DB, func()) {
-	r := require.New(t)
-
-	db, err := sql.Open("pgx", dbURL)
-	r.NoError(err)
-
-	return db, func() {
-		_, err = db.Exec("TRUNCATE \"accounts\",\"entries\",\"transfers\"")
-		r.NoError(err)
-
-		err = db.Close()
-		r.NoError(err)
-	}
-}
-
 func createRandomAccount(t *testing.T) Account {
 	ctx := context.Background()
+	user := createRandomUser(t)
 
 	db, finalizer := SetupTables(t)
 	t.Cleanup(finalizer)
@@ -43,7 +25,7 @@ func createRandomAccount(t *testing.T) Account {
 	r := New(db)
 
 	arg := CreateAccountParams{
-		Owner:    testutils.RandomOwner(),
+		Owner:    user.Username,
 		Balance:  testutils.RandomMoney(),
 		Currency: testutils.RandomCurrency(),
 	}
@@ -155,23 +137,4 @@ func TestListAccounts(t *testing.T) {
 		require.NotEmpty(t, account)
 		require.Equal(t, lastAccount.Owner, account.Owner)
 	}
-}
-
-func TestMain(m *testing.M) {
-	appConfig, err := config.New()
-	if err != nil {
-		panic(err)
-	}
-
-	testutils.SeedRand()
-
-	var finalizer func()
-	dbURL, finalizer = testutils.SetupDatabase(appConfig)
-
-	code := m.Run()
-
-	// can't use defer since os.Exit doesn't care for defers
-	finalizer()
-
-	os.Exit(code)
 }

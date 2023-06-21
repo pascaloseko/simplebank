@@ -3,10 +3,9 @@ package testutils
 import (
 	cryptorand "crypto/rand"
 	"encoding/binary"
+	"fmt"
 	mathrand "math/rand"
 	"strings"
-
-	"github.com/simplebank/util"
 )
 
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -50,7 +49,12 @@ func RandomMoney() int64 {
 
 // RandomCurrency generates a random currency code
 func RandomCurrency() string {
-	currencies := []string{util.EUR, util.USD, util.CAD}
+	currencies := []string{EUR, USD, CAD}
 	n := len(currencies)
 	return currencies[mathrand.Intn(n)]
+}
+
+// RandomEmail generates a random email
+func RandomEmail() string {
+	return fmt.Sprintf("%s@email.com", RandomString(6))
 }

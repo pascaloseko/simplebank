@@ -1,4 +1,4 @@
-package util
+package testutils
 
 // Constants for all supported currencies
 const (

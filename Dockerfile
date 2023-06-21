@@ -21,7 +21,7 @@ FROM golangci/golangci-lint:v1.45.1 as golangci-lint
 
 ###################################################
 # install sqlc for code generation
-FROM kjconroy/sqlc:1.13.0 as sqlc
+FROM kjconroy/sqlc:1.14.0 as sqlc
 
 ###################################################
 # install golang-migrate for migrations cli
