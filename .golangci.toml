@@ -27,6 +27,8 @@ alias = [
     {pkg = "github.com/satori/go.uuid", alias = "uuid"},
     {pkg = "crypto/rand", alias = "cryptorand"},
     {pkg = "math/rand", alias = "mathrand"},
+    {pkg = "github.com/simplebank/repo/mock", alias = "mockdb"},
+    {pkg = "github.com/GoogleCloudPlatform/opentelemetry-operations-go/propagator", alias = "gcloudPropagator"},
 ]
 
 [linters]
