@@ -39,3 +39,11 @@ tidy:
 .PHONY: generate
 generate:
 	@docker compose run --rm app sqlc generate
+
+.PHONY: mock
+mock:
+	@docker compose run --rm app mockgen --package mockdb --destination repo/mock/store.go github.com/simplebank/repo Store
+
+.PHONY: server
+server:
+	go run main.go server

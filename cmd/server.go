@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/pkg/errors"
+	"github.com/simplebank/repo"
+
 	"github.com/simplebank/config"
 	"github.com/simplebank/server"
 
@@ -28,9 +31,10 @@ func serverCmdFactory(appConfig *config.Config, tracerProvider trace.TracerProvi
 			if appConfig.RuntimeEnvironment == "cloud" && appConfig.Appenv == "backops" {
 				appConfig.Appenv = os.Getenv("GOOGLE_CLOUD_PROJECT")
 			}
-			api := server.NewServer(appConfig, db)
+			store := repo.NewStore(db)
+			api := server.NewServer(appConfig, store)
 			err := api.Serve(cmd.Context(), tracerProvider, propagator)
-			if err != nil && err != context.Canceled && err != http.ErrServerClosed {
+			if err != nil && !errors.Is(err, context.Canceled) && !errors.Is(err, http.ErrServerClosed) {
 				return err
 			}
 			return nil

@@ -2,50 +2,47 @@ package server
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"net"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/simplebank/config"
 	"github.com/simplebank/repo"
 
-	"github.com/gorilla/mux"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type Server struct {
 	appConfig *config.Config
-	queries   *repo.Queries
+	store     repo.Store
+	router    *gin.Engine
 }
 
-func NewServer(appConfig *config.Config, db *sql.DB) *Server {
-	queries := repo.New(db)
-	return &Server{appConfig: appConfig, queries: queries}
+func NewServer(appConfig *config.Config, store repo.Store) *Server {
+	return &Server{appConfig: appConfig, store: store}
 }
 
 // Serve serves the api endpoint
-func (s *Server) Serve(ctx context.Context, tracerProvider trace.TracerProvider, propagator propagation.TextMapPropagator) error {
+func (s *Server) Serve(ctx context.Context, _ trace.TracerProvider, _ propagation.TextMapPropagator) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	router := mux.NewRouter()
-	router.Use(otelmux.Middleware("server", otelmux.WithTracerProvider(tracerProvider), otelmux.WithPropagators(propagator)))
+	s.setupRouter()
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%s", s.appConfig.Port),
 		WriteTimeout: s.appConfig.WriteTimeOut,
 		ReadTimeout:  s.appConfig.ReadTimeOut,
 		IdleTimeout:  s.appConfig.IdleTimeOut,
-		Handler:      router,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		}}
 	ch := make(chan error, 1)
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
-		err := server.ListenAndServe()
+		err := s.router.Run(server.Addr)
 		ch <- err
 		close(ch)
 	}()
@@ -56,4 +53,18 @@ func (s *Server) Serve(ctx context.Context, tracerProvider trace.TracerProvider,
 		err := server.Shutdown(ctx)
 		return err
 	}
+}
+
+func (s *Server) setupRouter() {
+	router := gin.Default()
+
+	router.POST("/accounts", s.createAccount)
+	router.GET("/accounts/:id", s.getAccount)
+	router.GET("/accounts", s.listAccounts)
+
+	s.router = router
+}
+
+func errResponse(err error) gin.H {
+	return gin.H{"error": err.Error()}
 }

@@ -28,6 +28,10 @@ FROM kjconroy/sqlc:1.13.0 as sqlc
 FROM migrate/migrate:v4.15.1 as golang-migrate
 
 ###################################################
+# install mockgen for generating mock stubs
+FROM pricec/gomock as mockgen
+
+###################################################
 FROM builder AS local
 
 ENV TZ=UTC \
@@ -46,6 +50,8 @@ COPY --from=golangci-lint /usr/bin/golangci-lint /go/bin/golangci-lint
 COPY --from=golang-migrate /usr/local/bin/migrate /go/bin/migrate
 
 COPY --from=sqlc /workspace/sqlc /go/bin/sqlc
+
+COPY --from=mockgen /usr/local/bin/mockgen /go/bin/mockgen
 
 CMD ["go", "run", "."]
 
