@@ -5,6 +5,8 @@ import (
 	"encoding/binary"
 	mathrand "math/rand"
 	"strings"
+
+	"github.com/simplebank/util"
 )
 
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -48,7 +50,7 @@ func RandomMoney() int64 {
 
 // RandomCurrency generates a random currency code
 func RandomCurrency() string {
-	currencies := []string{"EUR", "USD", "CAD"}
+	currencies := []string{util.EUR, util.USD, util.CAD}
 	n := len(currencies)
 	return currencies[mathrand.Intn(n)]
 }

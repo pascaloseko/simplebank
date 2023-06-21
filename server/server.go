@@ -6,6 +6,9 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/simplebank/config"
@@ -58,9 +61,18 @@ func (s *Server) Serve(ctx context.Context, _ trace.TracerProvider, _ propagatio
 func (s *Server) setupRouter() {
 	router := gin.Default()
 
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		err := v.RegisterValidation("currency", validCurrency)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	router.POST("/accounts", s.createAccount)
 	router.GET("/accounts/:id", s.getAccount)
 	router.GET("/accounts", s.listAccounts)
+
+	router.POST("/transfers", s.createTransfer)
 
 	s.router = router
 }
