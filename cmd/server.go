@@ -32,8 +32,11 @@ func serverCmdFactory(appConfig *config.Config, tracerProvider trace.TracerProvi
 				appConfig.Appenv = os.Getenv("GOOGLE_CLOUD_PROJECT")
 			}
 			store := repo.NewStore(db)
-			api := server.NewServer(appConfig, store)
-			err := api.Serve(cmd.Context(), tracerProvider, propagator)
+			api, err := server.NewServer(appConfig, store)
+			if err != nil {
+				return err
+			}
+			err = api.Serve(cmd.Context(), tracerProvider, propagator)
 			if err != nil && !errors.Is(err, context.Canceled) && !errors.Is(err, http.ErrServerClosed) {
 				return err
 			}

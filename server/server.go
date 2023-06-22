@@ -9,6 +9,8 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 
+	"github.com/simplebank/token"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/simplebank/config"
@@ -19,13 +21,27 @@ import (
 )
 
 type Server struct {
-	appConfig *config.Config
-	store     repo.Store
-	router    *gin.Engine
+	appConfig  *config.Config
+	store      repo.Store
+	tokenMaker token.Maker
+	router     *gin.Engine
 }
 
-func NewServer(appConfig *config.Config, store repo.Store) *Server {
-	return &Server{appConfig: appConfig, store: store}
+func NewServer(appConfig *config.Config, store repo.Store) (*Server, error) {
+	tokenMaker, err := token.NewPasetoMaker(appConfig.TokenSymmetricKey)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create token maker: %w", err)
+	}
+
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		err := v.RegisterValidation("currency", validCurrency)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	server := &Server{appConfig: appConfig, store: store, tokenMaker: tokenMaker}
+	return server, nil
 }
 
 // Serve serves the api endpoint
@@ -61,20 +77,15 @@ func (s *Server) Serve(ctx context.Context, _ trace.TracerProvider, _ propagatio
 func (s *Server) setupRouter() {
 	router := gin.Default()
 
-	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		err := v.RegisterValidation("currency", validCurrency)
-		if err != nil {
-			panic(err)
-		}
-	}
+	router.POST("/users", s.createUser)
+	router.POST("/users/login", s.loginUser)
+	router.POST("/tokens/renew_access", s.renewAccessToken)
 
 	router.POST("/accounts", s.createAccount)
 	router.GET("/accounts/:id", s.getAccount)
 	router.GET("/accounts", s.listAccounts)
 
 	router.POST("/transfers", s.createTransfer)
-
-	router.POST("/users", s.createUser)
 
 	s.router = router
 }

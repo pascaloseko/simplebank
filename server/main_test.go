@@ -16,7 +16,10 @@ func newTestServer(t *testing.T, store repo.Store) *Server {
 		t.Fatalf("failed to create app config: %s", err)
 	}
 
-	server := NewServer(appConfig, store)
+	server, err := NewServer(appConfig, store)
+	if err != nil {
+		t.Fatalf("failed to run server: %s", err)
+	}
 
 	return server
 }
