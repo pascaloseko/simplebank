@@ -35,6 +35,11 @@ type Config struct {
 	DBUrl     string
 	TestDBUrl string
 
+	// token config
+	TokenSymmetricKey    string
+	AccessTokenDuration  time.Duration
+	RefreshTokenDuration time.Duration
+
 	// Server Timeouts
 	WriteTimeOut time.Duration
 	ReadTimeOut  time.Duration
