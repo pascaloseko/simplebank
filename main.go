@@ -31,19 +31,13 @@ func main() {
 
 	tracerProvider, propagator := cmd.InitOtel()
 	transport := otelhttp.NewTransport(cmd.DefaultPooledTransport(), otelhttp.WithTracerProvider(tracerProvider), otelhttp.WithPropagators(propagator))
-	if appConfig.Testing {
-		db, err = sql.Open("pgx", appConfig.TestDBUrl)
-		if err != nil {
-			log.Err(err).Msg("database connection error")
-			panic(err)
-		}
-	} else {
-		db, err = sql.Open("pgx", appConfig.DBUrl)
-		if err != nil {
-			log.Err(err).Msg("database connection error")
-			panic(err)
-		}
+
+	db, err = sql.Open("pgx", appConfig.DBUrl)
+	if err != nil {
+		log.Err(err).Msg("database connection error")
+		panic(err)
 	}
+
 	// Establish database connection
 	err = db.PingContext(ctx)
 	if err != nil {

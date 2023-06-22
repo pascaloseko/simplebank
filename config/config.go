@@ -32,8 +32,7 @@ type Config struct {
 	Testing bool
 
 	// DB
-	DBUrl     string
-	TestDBUrl string
+	DBUrl string
 
 	// token config
 	TokenSymmetricKey    string

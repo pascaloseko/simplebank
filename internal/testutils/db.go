@@ -18,7 +18,7 @@ const (
 )
 
 func SetupDatabase(appConfig *config.Config) (string, func()) {
-	dsn, err := url.Parse(appConfig.TestDBUrl)
+	dsn, err := url.Parse(appConfig.DBUrl)
 	if err != nil {
 		panic(err)
 	}

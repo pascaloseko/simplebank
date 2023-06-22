@@ -46,4 +46,4 @@ mock:
 
 .PHONY: server
 server:
-	go run main.go server
+	@docker compose run --rm app go run main.go server

@@ -1,8 +1,7 @@
 Environment = "local"
 LogLevel = "debug"
 
-DBUrl = "postgres://postgres:password@127.0.0.1:5432/simple_bank?sslmode=disable"
-TestDBUrl = "postgres://user:mypassword@db:5432/user?sslmode=disable"
+DBUrl = "postgres://user:mypassword@db:5432/user?sslmode=disable"
 TokenSymmetricKey = "12345678901234567890123456789012"
 AccessTokenDuration = "15m"
 RefreshTokenDuration = "24h"
