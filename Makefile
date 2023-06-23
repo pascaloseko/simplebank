@@ -1,3 +1,5 @@
+DB_URL=postgres://postgres:password@localhost:5432/postgres?sslmode=disable
+
 .PHONE: help
 help:
 	@printf "%24s: %s\n" "proto-compile" "Compile protobuf schemas"
@@ -47,3 +49,19 @@ mock:
 .PHONY: server
 server:
 	@docker compose run --rm app go run main.go server
+
+.PHONY: migrateup
+migrateup:
+	migrate -path db/migrations -database "$(DB_URL)" -verbose up
+
+.PHONY: migrateup1
+migrateup1:
+	migrate -path db/migrations -database "$(DB_URL)" -verbose up 1
+
+.PHONY: migratedown
+migratedown:
+	migrate -path db/migrations -database "$(DB_URL)" -verbose down
+
+.PHONY: migratedown1
+migratedown1:
+	migrate -path db/migrations -database "$(DB_URL)" -verbose down 1
