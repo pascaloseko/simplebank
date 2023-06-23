@@ -78,6 +78,8 @@ COPY --from=cloudbuilder /etc/ssl/certs /etc/ssl/certs
 
 COPY --from=cloudbuilder /usr/local/bin/simplebank /usr/local/bin/simplebank
 
+COPY config.local.toml .
+
 CMD ["/usr/local/bin/simplebank"]
 
 LABEL Description="Simple Bank Backend image" Vendor="Pascal Oseko"
