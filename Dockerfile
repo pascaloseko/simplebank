@@ -74,8 +74,8 @@ WORKDIR /app
 
 COPY --from=cloudbuilder /etc/ssl/certs /etc/ssl/certs
 
-COPY --from=cloudbuilder /usr/local/bin/simple-bank /usr/local/bin/simple-bank
+COPY --from=cloudbuilder /usr/local/bin/simplebank /usr/local/bin/simplebank
 
-CMD ["/usr/local/bin/simple-bank"]
+CMD ["/usr/local/bin/simplebank"]
 
 LABEL Description="Simple Bank Backend image" Vendor="Pascal Oseko"
