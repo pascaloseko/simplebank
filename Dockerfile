@@ -39,6 +39,8 @@ ENV TZ=UTC \
 
 WORKDIR /app
 
+COPY config.local.toml .
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # edit pip installed libraries
     vim \
