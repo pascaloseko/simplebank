@@ -80,6 +80,6 @@ COPY --from=cloudbuilder /usr/local/bin/simplebank /usr/local/bin/simplebank
 
 COPY config.local.toml .
 
-CMD ["/usr/local/bin/simplebank"]
+CMD ["/usr/local/bin/simplebank", "server"]
 
 LABEL Description="Simple Bank Backend image" Vendor="Pascal Oseko"
